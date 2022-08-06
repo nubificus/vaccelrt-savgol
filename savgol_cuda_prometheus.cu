@@ -300,6 +300,11 @@ char sgcoeff(double c[], int np, int nl, int nr, int ld, int m)
 }
 /////////////////////////
 
+
+struct vaccel_arg {
+        uint32_t len;
+        uint8_t *buf;
+};
 extern "C" 
 
 int savgol_GPU(int argc, char **argv)
@@ -340,12 +345,13 @@ int savgol_GPU(int argc, char **argv)
 
     version_info.Add({{"prometheus", "1.0"}});
 
-    string data_file_path = "dataset.txt";
+    std::string FILE_PATH = argv[1];
+    string data_file_path = FILE_PATH;
     // string golden_file_path = "dataset.txt";
     string line;
 
     cout << "* Savgol Filter *" << endl;
-    cout << " # input file:               " << data_file_path << endl;
+    //cout << " # input file:               " << data_file_path << endl;
     // cout << " # golden file:                " << golden_file_path << endl;
 
     double *indata, *outdata;
@@ -353,9 +359,21 @@ int savgol_GPU(int argc, char **argv)
     outdata = (double *)malloc(DATA_SIZE * sizeof(double));
     int rowcount = DATA_SIZE;
 
+    if (strcmp(argv[0],"vaccel") == 0 ) {
+          std::istringstream file(FILE_PATH);
+    int index = 0;
+    while (getline(file, line)) {
+        indata[index] = (float)atof(line.c_str());
+        index++;
+        //  cout << to_string(data[index-1]) << endl;
+    }
+
+
+    } else {
+    cout << " # input file:               " << data_file_path << endl;
     // read input data
     ifstream data_file;
-    data_file.open("dataset.txt");
+    data_file.open(FILE_PATH);
     int index = 0;
     while (getline(data_file, line))
     {
@@ -364,6 +382,10 @@ int savgol_GPU(int argc, char **argv)
         //  cout << to_string(data[index-1]) << endl;
     }
     data_file.close();
+
+
+  }
+
 
     int nl; //= DEFAULT_NL;
     int nr; //= DEFAULT_NR;
@@ -447,3 +469,33 @@ int savgol_GPU(int argc, char **argv)
     ///////////////////////////////////////////////
     return 0;
 }
+
+extern "C" 
+
+int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in_nargs)
+{
+
+	struct vaccel_arg *in_arg = (struct vaccel_arg*)in_args;
+        struct vaccel_arg *out_arg = (struct vaccel_arg*)out_args;
+
+        int argc = 2;
+        char *argv[2] = {
+                "vaccel",
+                (char *)out_arg[0].buf
+        };
+
+        //printf("argv0=%s, %s\n", argv[0], argv[1]);
+        //printf("out_arg[0]=%lf\n", *(float *)out_arg[0].buf);
+        int ret = savgol_GPU(argc, argv);
+        printf("ret=%d\n", ret);
+
+#if 1
+        *(uint32_t*)in_arg[0].buf = ret;
+        in_arg[0].len = sizeof(uint32_t);
+#endif
+
+//      fflush(stdout);
+        return 0;
+}
+
+

@@ -31,10 +31,13 @@ wrapper_vaccel.o: wrapper_vaccel.c
 libsavgol_vaccel.so: wrapper_vaccel.o
 	gcc $< -o $@ ${LDFLAGS_VACCEL} -shared
 
-wrapper_vaccel: wrapper_host.o
+wrapper_host_vaccel.o: wrapper_host_vaccel.c
+	$(CC) -c $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER} ${LDFLAGS_VACCEL}
+
+wrapper_vaccel: wrapper_host_vaccel.o
 	$(LD) $< -o $@  -lsavgol_vaccel -L. ${LDFLAGS_VACCEL}
 
 
 
 clean:
-	-rm -f  wrapper_host wrapper_vaccel *.so *.o
+	-rm -f  wrapper_host wrapper_vaccel *.so *.o 
