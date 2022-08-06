@@ -307,7 +307,7 @@ struct vaccel_arg {
 };
 extern "C" 
 
-int savgol_GPU(int argc, char **argv)
+int savgol_GPU(int argc, char **argv, double *time1, double *time2)
 {
 
     //---- prometheus stuff ----
@@ -456,6 +456,8 @@ int savgol_GPU(int argc, char **argv)
     fprintf(stderr, "total GPU process time: %lf msecs\n", (t10) / 1000.0F);
     double t32 = (t3.tv_sec * 1000000.0 + t3.tv_usec) - (t2.tv_sec * 1000000.0 + t2.tv_usec);
     fprintf(stderr, "only savgol GPU kernel time: %lf msecs\n", (t32) / 1000.0F);
+    *time1 = t10;
+    *time2 = t32;
 
     free_dvector(c, 1, nr + nl + 1);
 
@@ -467,6 +469,7 @@ int savgol_GPU(int argc, char **argv)
     }
 
     ///////////////////////////////////////////////
+
     return 0;
 }
 
@@ -479,6 +482,7 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
         struct vaccel_arg *out_arg = (struct vaccel_arg*)out_args;
 
         int argc = 2;
+	double time1, time2;
         char *argv[2] = {
                 "vaccel",
                 (char *)out_arg[0].buf
@@ -486,15 +490,18 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
 
         //printf("argv0=%s, %s\n", argv[0], argv[1]);
         //printf("out_arg[0]=%lf\n", *(float *)out_arg[0].buf);
-        int ret = savgol_GPU(argc, argv);
-        printf("ret=%d\n", ret);
+        int ret = savgol_GPU(argc, argv, &time1, &time2);
+        printf("ret=%d time1 %lf, time2 %lf\n", ret, time1, time2);
 
 #if 1
-        *(uint32_t*)in_arg[0].buf = ret;
-        in_arg[0].len = sizeof(uint32_t);
+        *(double*)in_arg[0].buf = time1;
+        in_arg[0].len = sizeof(double);
+        *(double*)in_arg[1].buf = time2;
+        in_arg[1].len = sizeof(double);
 #endif
 
 //      fflush(stdout);
+    	cudaDeviceReset();
         return 0;
 }
 
