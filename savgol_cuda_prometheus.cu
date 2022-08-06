@@ -300,7 +300,9 @@ char sgcoeff(double c[], int np, int nl, int nr, int ld, int m)
 }
 /////////////////////////
 
-int main(int argc, char **argv)
+extern "C" 
+
+int savgol_GPU(int argc, char **argv)
 {
 
     //---- prometheus stuff ----
