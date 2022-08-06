@@ -164,3 +164,18 @@ output:0
 2022.08.06-14:02:54.25 - <debug> Unregistered plugin virtio
 ```
 
+### OpenFaaS build & deploy
+
+build:
+```
+export TOKEN=<ghtoken>
+docker build -t registry.nubificus.co.uk/serrano/savgol-vaccel:latest -f openfaas/Dockerfile . --build-arg TOKEN=$TOKEN
+docker push registry.nubificus.co.uk/serrano/savgol-vaccel:latest 
+```
+
+deploy:
+```
+faas-cli deploy -f openfaas/stack-savgol.yml
+```
+*Note*: to run, we need: (a) a vaccel installation, (b) a kata-vaccel installation, and (c) `libsavgol_cuda_prometheus.so` in `/opt/vaccel/lib`
+

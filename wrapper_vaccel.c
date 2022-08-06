@@ -11,6 +11,26 @@
 struct vaccel_prof_region savgol_op_stats =
         VACCEL_PROF_REGION_INIT("vaccel_savgol");
 
+
+#define CHUNK 4096
+int fileread_from_stdin(char**ptr, ssize_t *len)
+{
+        char buf[CHUNK];
+        int ret = 0;
+        int size = 0;
+        char *p = malloc(CHUNK);
+        while ((ret = read (STDIN_FILENO, buf, CHUNK)) > 0) {
+                size += ret;
+                p = realloc(p, size);
+                memcpy(p+(size - ret), buf, ret);
+        }
+        //write(STDOUT_FILENO, p, size);
+        *ptr = p;
+        *len = size;
+
+        return 0;
+}
+
 int read_file(const char *filename, char **img, size_t *img_size)
 {
         int fd;
@@ -66,12 +86,16 @@ int savgol_GPU_vaccel(int argc, char ** argv)
         int ret = 0;
         struct vaccel_session sess;
         struct vaccel_arg args[3];
-        uint32_t output;
+        double time1, time2;
 	size_t file_size;
         char *file;
 
 	printf("filename: %s\n", argv[1]);
+#if 0
         if (read_file(argv[1], &file, &file_size))
+                return 1;
+#endif
+        if (fileread_from_stdin(&file, &file_size))
                 return 1;
 
         vaccel_prof_region_start(&savgol_op_stats);
@@ -87,23 +111,25 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         char operation[256] = "savgol_GPU_unpack";
         char library[512];
-        sprintf(library, "libsavgol_cuda_prometheus.so");
+        sprintf(library, "/opt/vaccel/lib/libsavgol_cuda_prometheus.so");
 
         memset(args, 0, sizeof(args));
         args[0].size = file_size;
         args[0].buf = file;
 
-        args[2].size = sizeof(uint32_t);
-        args[2].buf = &output;
+        args[1].size = sizeof(double);
+        args[1].buf = &time1;
+        args[2].size = sizeof(double);
+        args[2].buf = &time2;
 
         printf("librar:%s\n", library);
-        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[2], 1);
+        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 2);
         if (ret) {
                 fprintf(stderr, "Could not run op: %d\n", ret);
                 goto close_session;
         }
 
-        printf("output:%lu\n", output);
+        printf("time1:%lf %lf\n", time1, time2);
 close_session:
         if (vaccel_sess_free(&sess) != VACCEL_OK) {
                 fprintf(stderr, "Could not clear session\n");
