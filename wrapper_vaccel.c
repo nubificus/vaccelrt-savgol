@@ -60,7 +60,7 @@ close_file:
         return 1;
 }
 
-int savgol_GPU(int argc, char ** argv)
+int savgol_GPU_vaccel(int argc, char ** argv)
 {
 
         int ret = 0;
@@ -70,6 +70,7 @@ int savgol_GPU(int argc, char ** argv)
 	size_t file_size;
         char *file;
 
+	printf("filename: %s\n", argv[1]);
         if (read_file(argv[1], &file, &file_size))
                 return 1;
 
@@ -84,7 +85,7 @@ int savgol_GPU(int argc, char ** argv)
         printf("Initialized session with id: %u\n", sess.session_id);
 
 
-        char operation[256] = "savgol_GPU";
+        char operation[256] = "savgol_GPU_unpack";
         char library[512];
         sprintf(library, "libsavgol_cuda_prometheus.so");
 
