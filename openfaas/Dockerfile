@@ -1,18 +1,22 @@
-FROM ubuntu:20.04 as builder
+FROM dustynv/jetson-inference:r32.6.1 as builder
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
-RUN apt-get update && apt-get install -y build-essential git pkg-config nvidia-cuda-toolkit \
-	libz-dev bison flex wget bc libssl-dev \
-	unzip && apt-get clean
+#RUN apt-get update && apt-get install -y build-essential git pkg-config nvidia-cuda-toolkit \
+#	libz-dev bison flex wget bc libssl-dev \
+#	unzip && apt-get clean
 
-RUN mkdir /opt/vaccel && wget https://github.com/cloudkernels/vaccel/releases/download/v0.4.0/vaccel_x86_64_Release.tar.gz && tar -zxvf vaccel_x86_64_Release.tar.gz -C /opt/vaccel
+RUN mkdir /opt/vaccel && wget https://github.com/cloudkernels/vaccel/releases/download/v0.4.0/vaccel_aarch64_Release.tar.gz && tar -zxvf vaccel_aarch64_Release.tar.gz -C /opt/vaccel
 
+#FROM ubuntu:20.04 as prom-builder
+
+ENV DEBIAN_FRONTEND="noninteractive"
 RUN apt-get update --fix-missing && \
-    apt-get install -y ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion zlib1g-dev libcurl4-openssl-dev zlib1g cmake python3-pip curl && \
+    apt-get install -y ca-certificates libglib2.0-0 libxext6 libsm6 libxrender1 git mercurial subversion zlib1g-dev libcurl4-openssl-dev zlib1g cmake python3-pip curl cmake && \
     apt-get clean
 
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+RUN apt-get install -y wget curl
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh && \
     /opt/conda/bin/conda clean -tipsy && \
@@ -24,17 +28,9 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
     /opt/conda/bin/conda clean -afy
 RUN pip3 install pandas
 
-RUN git clone https://github.com/jupp0r/prometheus-cpp
-WORKDIR /prometheus-cpp
-RUN git submodule update --init --recursive
-RUN git submodule update
-RUN  mkdir _build
-WORKDIR /prometheus-cpp/_build
-RUN pip3 install cmake
-RUN cmake .. -DBUILD_SHARED_LIBS=ON
-RUN cmake --build . --parallel 4
-RUN ctest -V
-RUN cmake --install .
+RUN apt-get install -y libssl-dev
+RUN pip3 install cmake==3.18.4
+RUN git clone https://github.com/jupp0r/prometheus-cpp && cd prometheus-cpp && git submodule update --init --recursive && mkdir _build && cd _build && cmake .. -DBUILD_SHARED_LIBS=ON && cmake --build . --parallel 4 && ctest -V && cmake --install .
 
 WORKDIR /
 ARG TOKEN
