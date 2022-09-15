@@ -4,9 +4,9 @@ CC=gcc
 LD=g++ 
 NVCC=nvcc
 CFLAGS=-Wall
-LDFLAGS=
+LDFLAGS=-shared
 LDFLAGS_PROM=-lprometheus-cpp-pull  -lprometheus-cpp-core -lcurl -lz -shared
-LDFLAGS_WRAPPER=-lsavgol_cuda_prometheus -L.
+LDFLAGS_WRAPPER=-lsavgol_cuda -L.
 CFLAGS_VACCEL=-I/opt/vaccel-v0.4.0/include
 LDFLAGS_VACCEL=-lvaccel -L/opt/vaccel-v0.4.0/lib -ldl
 
