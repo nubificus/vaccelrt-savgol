@@ -111,7 +111,7 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         char operation[256] = "savgol_GPU_unpack";
         char library[512];
-        sprintf(library, "/opt/vaccel/lib/libsavgol_cuda.so");
+        sprintf(library, "/usr/local/lib/libsavgol_cuda.so");
 
         memset(args, 0, sizeof(args));
         args[0].size = file_size;
