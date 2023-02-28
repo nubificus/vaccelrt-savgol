@@ -135,9 +135,15 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         printf("GPU process time:%lf Savgol Kernel: %lf\n", time1/1000.0, time2/1000.0);
 
-	for (i = 0; i < args[3].size / sizeof(double); i++) {
+	//for (i = 0; i < args[3].size / sizeof(double); i++) {
+	for (i = 0; i < 10; i++) {
 		printf("%lf\n", ((double*)output)[i]);
 	}
+#if 0
+	int fd = open("/tmp/myfile", O_RDWR | O_APPEND | O_CREAT);
+	write(fd, output, args[3].size);
+#endif
+
 close_session:
         if (vaccel_sess_free(&sess) != VACCEL_OK) {
                 fprintf(stderr, "Could not clear session\n");

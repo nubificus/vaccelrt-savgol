@@ -303,7 +303,7 @@ int savgol_GPU(int argc, char **argv, double *time1, double*time2, uint8_t**outp
     string line;
 
     cout << "* Savgol Filter *" << endl;
-    cout << " # input file:               " << data_file_path << endl;
+    //cout << " # input file:               " << data_file_path << endl;
     // cout << " # golden file:                " << golden_file_path << endl;
 
     double *indata, *outdata;
