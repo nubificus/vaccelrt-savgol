@@ -458,7 +458,8 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
     }
 #endif
 
-    in_arg[2].len=sizeof(double) * DATA_SIZE;
+        in_arg[2].len=sizeof(double) * DATA_SIZE;
+	printf("in_arg[2].len: %d\n", in_arg[2].len);
 
 
 #if 1

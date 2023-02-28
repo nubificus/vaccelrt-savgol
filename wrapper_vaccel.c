@@ -125,6 +125,9 @@ int savgol_GPU_vaccel(int argc, char ** argv)
         args[3].size = file_size;
         args[3].buf = output;
 
+	printf("args[3].size: %d\n", args[3].size);
+	printf("total numbers: %d\n", args[3].size/sizeof(double));
+
         printf("Host library: %s\n", library);
         printf("Operation: %s\n", operation);
         ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 3);
@@ -135,10 +138,14 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         printf("GPU process time:%lf Savgol Kernel: %lf\n", time1/1000.0, time2/1000.0);
 
+	printf("args[3].size: %d\n", args[3].size);
+	printf("total numbers: %d\n", args[3].size/sizeof(double));
+#if 0
 	for (i = 0; i < args[3].size / sizeof(double); i++) {
 	//for (i = 0; i < 10; i++) {
 		printf("%lf\n", ((double*)output)[i]);
 	}
+#endif
 #if 0
 	int fd = open("/tmp/myfile", O_RDWR | O_APPEND | O_CREAT);
 	write(fd, output, args[3].size);
