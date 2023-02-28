@@ -15,28 +15,28 @@ all: libsavgol_cuda.so libsavgol_vaccel.so wrapper_vaccel
 
 libsavgol_cuda.so: savgol_cuda.cu
 	#$(CC) $< -o $@ ${CFLAGS} -fPIC -shared ${LDFLAGS}
-	$(NVCC) --compiler-options '-fPIC' $< -o $@ ${LDFLAGS}
+	$(NVCC) -g --compiler-options '-fPIC' $< -o $@ ${LDFLAGS}
 
 libsavgol_cuda_prometheus.so: savgol_cuda_prometheus.cu
 	$(NVCC) --compiler-options '-fPIC' $< -o $@ ${LDFLAGS_PROM}
 
 wrapper_host.o: wrapper_host.c
-	$(CC) -c $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER}
+	$(CC) -g -c $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER}
 
 wrapper_host: wrapper_host.o
-	$(LD) $< -o $@ ${LDFLAGS_WRAPPER}
+	$(LD) -g $< -o $@ ${LDFLAGS_WRAPPER}
 
 wrapper_vaccel.o: wrapper_vaccel.c
-	$(CC) -c -fPIC $< -o $@ ${CFLAGS_VACCEL} ${LDFLAGS_VACCEL}
+	$(CC) -g -c -fPIC $< -o $@ ${CFLAGS_VACCEL} ${LDFLAGS_VACCEL}
 
 libsavgol_vaccel.so: wrapper_vaccel.o
-	gcc $< -o $@ ${LDFLAGS_VACCEL} -shared
+	gcc $< -g -o $@ ${LDFLAGS_VACCEL} -shared
 
 wrapper_host_vaccel.o: wrapper_host_vaccel.c
-	$(CC) -c $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER} ${LDFLAGS_VACCEL}
+	$(CC) -c-g  $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER} ${LDFLAGS_VACCEL}
 
 wrapper_vaccel: wrapper_host_vaccel.o
-	$(LD) $< -o $@  -lsavgol_vaccel -L. ${LDFLAGS_VACCEL}
+	$(LD) $< -g -o $@  -lsavgol_vaccel -L. ${LDFLAGS_VACCEL}
 
 
 

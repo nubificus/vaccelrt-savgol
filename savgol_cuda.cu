@@ -419,15 +419,21 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
 
         int argc = 2;
         double time1, time2;
-	double *array_in;
+	double *array_in = (double *)out_arg[0].buf;
 	double *array_out;
+	//memcpy(array_in, (char*)out_arg[0].buf, sizeof(double) * out_arg[0].len/sizeof(double));
         char *argv[2] = {
                 "vaccel",
-                (char *)out_arg[0].buf,
+                //(char *)out_arg[0].buf,
+                (char *)array_in,
         };
 
 	array_in = (double*)out_arg[0].buf;
 	array_out = (double*)in_arg[2].buf;
+	if (out_arg[0].len < sizeof(double) * DATA_SIZE) { 
+		printf("Invalid size: %d\n", out_arg[0].len);
+		return -EINVAL;
+	}
 #if 0
     for (int i = 0; i < 10; i++)
     {
