@@ -7,10 +7,11 @@ CFLAGS=-Wall
 LDFLAGS=-shared
 LDFLAGS_PROM=-lprometheus-cpp-pull  -lprometheus-cpp-core -lcurl -lz -shared
 LDFLAGS_WRAPPER=-lsavgol_cuda -L.
-CFLAGS_VACCEL=-I/opt/vaccel-v0.4.0/include
-LDFLAGS_VACCEL=-lvaccel -L/opt/vaccel-v0.4.0/lib -ldl
+CFLAGS_VACCEL=-I/opt/vaccel/include
+LDFLAGS_VACCEL=-lvaccel -L/opt/vaccel/lib -ldl
 
-all: libsavgol_cuda.so libsavgol_cuda_prometheus.so wrapper_host libsavgol_vaccel.so wrapper_vaccel
+#all: libsavgol_cuda.so libsavgol_cuda_prometheus.so wrapper_host libsavgol_vaccel.so wrapper_vaccel
+all: libsavgol_cuda.so libsavgol_vaccel.so wrapper_vaccel
 
 libsavgol_cuda.so: savgol_cuda.cu
 	#$(CC) $< -o $@ ${CFLAGS} -fPIC -shared ${LDFLAGS}
