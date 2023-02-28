@@ -429,7 +429,7 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
         };
 
 	array_in = (double*)out_arg[0].buf;
-	array_out = (double*)in_arg[2].buf;
+	array_out = (double*)in_arg[3].buf;
 	if (out_arg[0].len < sizeof(double) * DATA_SIZE) { 
 		printf("Invalid size: %d\n", out_arg[0].len);
 		return -EINVAL;
@@ -446,7 +446,7 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
 
         //printf("argv0=%s, %s\n", argv[0], argv[1]);
         //printf("out_arg[0]=%lf\n", *(float *)out_arg[0].buf);
-        int ret = savgol_GPU(argc, argv, &time1, &time2, &in_arg[2].buf);
+        int ret = savgol_GPU(argc, argv, &time1, &time2, &in_arg[3].buf);
         printf("ret=%d time1 %lf, time2 %lf\n", ret, time1, time2);
 
 #if 0
@@ -458,8 +458,8 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
     }
 #endif
 
-        in_arg[2].len=sizeof(double) * DATA_SIZE;
-	printf("in_arg[2].len: %d\n", in_arg[2].len);
+        *(size_t*)in_arg[2].buf = DATA_SIZE;
+	//printf("in_arg[2].len: %d\n", in_arg[2].len);
 
 
 #if 1

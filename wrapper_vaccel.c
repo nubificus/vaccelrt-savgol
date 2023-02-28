@@ -85,9 +85,10 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         int ret = 0, i = 0;
         struct vaccel_session sess;
-        struct vaccel_arg args[4];
+        struct vaccel_arg args[5];
         double time1, time2;
 	size_t file_size;
+	size_t out_size;
         char *file;
 
 	//printf("filename: %s\n", argv[1]);
@@ -122,26 +123,23 @@ int savgol_GPU_vaccel(int argc, char ** argv)
         args[1].buf = &time1;
         args[2].size = sizeof(double);
         args[2].buf = &time2;
-        args[3].size = file_size;
-        args[3].buf = output;
-
-	printf("args[3].size: %d\n", args[3].size);
-	printf("total numbers: %d\n", args[3].size/sizeof(double));
+        args[3].size = sizeof(size_t);
+        args[3].buf = &out_size;
+        args[4].size = file_size;
+        args[4].buf = output;
 
         printf("Host library: %s\n", library);
         printf("Operation: %s\n", operation);
-        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 3);
+        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 4);
         if (ret) {
                 fprintf(stderr, "Could not run op: %d\n", ret);
                 goto close_session;
         }
 
-        printf("GPU process time:%lf Savgol Kernel: %lf\n", time1/1000.0, time2/1000.0);
+        printf("GPU process time:%lf Savgol Kernel: %lf\n\n", time1/1000.0, time2/1000.0);
 
-	printf("args[3].size: %d\n", args[3].size);
-	printf("total numbers: %d\n", args[3].size/sizeof(double));
-#if 0
-	for (i = 0; i < args[3].size / sizeof(double); i++) {
+#if 1
+	for (i = 0; i < out_size; i++) {
 	//for (i = 0; i < 10; i++) {
 		printf("%lf\n", ((double*)output)[i]);
 	}
