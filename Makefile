@@ -33,7 +33,7 @@ libsavgol_vaccel.so: wrapper_vaccel.o
 	gcc $< -g -o $@ ${LDFLAGS_VACCEL} -shared
 
 wrapper_host_vaccel.o: wrapper_host_vaccel.c
-	$(CC) -c-g  $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER} ${LDFLAGS_VACCEL}
+	$(CC) -c -g  $< -o $@ ${CFLAGS} ${LDFLAGS_WRAPPER} ${LDFLAGS_VACCEL}
 
 wrapper_vaccel: wrapper_host_vaccel.o
 	$(LD) $< -g -o $@  -lsavgol_vaccel -L. ${LDFLAGS_VACCEL}
