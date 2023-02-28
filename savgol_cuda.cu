@@ -389,14 +389,16 @@ int savgol_GPU(int argc, char **argv, double *time1, double*time2, uint8_t**outp
 *time2 = t32;
     free_dvector(c, 1, nr + nl + 1);
 
-    for (int i = 0; i < 10; i++)
+#if 0
+    for (int i = 0; i < DATA_SIZE; i++)
     {
 
         printf("%lf ", indata[i]);
         printf("%lf\n ", outdata[i]);
     }
+#endif
 
-    memcpy(*output, outdata, sizeof(double) * 10);
+    memcpy(*output, outdata, sizeof(double) * DATA_SIZE);
     //sprintf(output, "%s", outdata);
     ///////////////////////////////////////////////
     return 0;
@@ -426,12 +428,14 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
 
 	array_in = (double*)out_arg[0].buf;
 	array_out = (double*)in_arg[2].buf;
+#if 0
     for (int i = 0; i < 10; i++)
     {
 
         printf("%lf ", array_in[i]);
         printf("%lf\n ", array_out[i]);
     }
+#endif
 
 
         //printf("argv0=%s, %s\n", argv[0], argv[1]);
@@ -439,13 +443,16 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
         int ret = savgol_GPU(argc, argv, &time1, &time2, &in_arg[2].buf);
         printf("ret=%d time1 %lf, time2 %lf\n", ret, time1, time2);
 
+#if 0
     for (int i = 0; i < 10; i++)
     {
 
         printf("%lf ", array_in[i]);
         printf("%lf\n ", array_out[i]);
     }
+#endif
 
+    in_arg[2].len=sizeof(double) * DATA_SIZE;
 
 
 #if 1

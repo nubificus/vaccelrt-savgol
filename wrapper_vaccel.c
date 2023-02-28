@@ -135,7 +135,7 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 
         printf("GPU process time:%lf Savgol Kernel: %lf\n", time1/1000.0, time2/1000.0);
 
-	for (i = 0; i < 10; i++) {
+	for (i = 0; i < args[3].size / sizeof(double); i++) {
 		printf("%lf\n", ((double*)output)[i]);
 	}
 close_session:
