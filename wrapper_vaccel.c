@@ -83,9 +83,9 @@ close_file:
 int savgol_GPU_vaccel(int argc, char ** argv)
 {
 
-        int ret = 0;
+        int ret = 0, i = 0;
         struct vaccel_session sess;
-        struct vaccel_arg args[3];
+        struct vaccel_arg args[4];
         double time1, time2;
 	size_t file_size;
         char *file;
@@ -98,6 +98,7 @@ int savgol_GPU_vaccel(int argc, char ** argv)
         if (fileread_from_stdin(&file, &file_size))
                 return 1;
 
+	char * output = malloc(file_size);
         vaccel_prof_region_start(&savgol_op_stats);
 
         ret = vaccel_sess_init(&sess, 0);
@@ -121,16 +122,22 @@ int savgol_GPU_vaccel(int argc, char ** argv)
         args[1].buf = &time1;
         args[2].size = sizeof(double);
         args[2].buf = &time2;
+        args[3].size = file_size;
+        args[3].buf = output;
 
         printf("Host library: %s\n", library);
         printf("Operation: %s\n", operation);
-        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 2);
+        ret = vaccel_exec(&sess, library, operation, &args[0], 1, &args[1], 3);
         if (ret) {
                 fprintf(stderr, "Could not run op: %d\n", ret);
                 goto close_session;
         }
 
         printf("GPU process time:%lf Savgol Kernel: %lf\n", time1/1000.0, time2/1000.0);
+
+	for (i = 0; i < 10; i++) {
+		printf("%lf\n", ((double*)output)[i]);
+	}
 close_session:
         if (vaccel_sess_free(&sess) != VACCEL_OK) {
                 fprintf(stderr, "Could not clear session\n");

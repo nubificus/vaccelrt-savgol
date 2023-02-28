@@ -293,7 +293,7 @@ char sgcoeff(double c[], int np, int nl, int nr, int ld, int m)
 
 extern "C"
 
-int savgol_GPU(int argc, char **argv, double *time1, double*time2)
+int savgol_GPU(int argc, char **argv, double *time1, double*time2, uint8_t**output)
 {
 
     //string data_file_path = "dataset.txt";
@@ -396,6 +396,8 @@ int savgol_GPU(int argc, char **argv, double *time1, double*time2)
         printf("%lf\n ", outdata[i]);
     }
 
+    memcpy(*output, outdata, sizeof(double) * 10);
+    //sprintf(output, "%s", outdata);
     ///////////////////////////////////////////////
     return 0;
 }
@@ -415,15 +417,36 @@ int savgol_GPU_unpack(void *out_args, size_t out_nargs, void* in_args, size_t in
 
         int argc = 2;
         double time1, time2;
+	double *array_in;
+	double *array_out;
         char *argv[2] = {
                 "vaccel",
-                (char *)out_arg[0].buf
+                (char *)out_arg[0].buf,
         };
+
+	array_in = (double*)out_arg[0].buf;
+	array_out = (double*)in_arg[2].buf;
+    for (int i = 0; i < 10; i++)
+    {
+
+        printf("%lf ", array_in[i]);
+        printf("%lf\n ", array_out[i]);
+    }
+
 
         //printf("argv0=%s, %s\n", argv[0], argv[1]);
         //printf("out_arg[0]=%lf\n", *(float *)out_arg[0].buf);
-        int ret = savgol_GPU(argc, argv, &time1, &time2);
+        int ret = savgol_GPU(argc, argv, &time1, &time2, &in_arg[2].buf);
         printf("ret=%d time1 %lf, time2 %lf\n", ret, time1, time2);
+
+    for (int i = 0; i < 10; i++)
+    {
+
+        printf("%lf ", array_in[i]);
+        printf("%lf\n ", array_out[i]);
+    }
+
+
 
 #if 1
         *(double*)in_arg[0].buf = time1;
