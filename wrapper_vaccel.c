@@ -102,7 +102,7 @@ int savgol_GPU_vaccel(int argc, char ** argv)
 	char * output = malloc(file_size);
         vaccel_prof_region_start(&savgol_op_stats);
 
-        ret = vaccel_sess_init(&sess, VACCEL_PLUGIN_GENERIC);
+        ret = vaccel_sess_init(&sess, atoi(getenv("VACCEL_PLUGIN_DEBUG")));
         if (ret != VACCEL_OK) {
                 fprintf(stderr, "Could not initialize session\n");
                 return 1;
